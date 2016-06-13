@@ -1,0 +1,7 @@
+double free!
+======= Backtrace start =======
+No.1: var p(file:addr_exp_test.c, line 12) init => unknown
+No.2: var *q(file:addr_exp_test.c, line 4) unknown => freed
+No.3: var p(file:addr_exp_test.c, line 14) freed => error
+======= Backtrace stop ========
+

@@ -1,0 +1,11 @@
+sm double_free_checker{
+   option sensitive;
+   declare_sv {ptr} p;
+
+   p.freed: { p = malloc() } => p.unknown {}
+   p.unknown: { p == NULL } => p.freed {}
+   p.unknown: { p != NULL } => p.malloced {}
+   p.unknown: { free(p) } => p.freed {}
+   p.malloced: { free(p) } => p.freed {}
+   p.freed: { free(p) } => p.freed { err("double free!\n"); backtrace(); }
+}

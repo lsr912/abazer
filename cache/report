@@ -1,0 +1,64 @@
+Unlock before Lock.
+======= Backtrace start =======
+q->p: init => error
+	test ()(file:cache.c, line 25)
+	_mtx_unlock_flags (&q->p)(file:cache.c, line 16)
+======= Backtrace stop ========
+
+Double lock.
+======= Backtrace start =======
+q->p: init => locked
+	test ()(file:cache.c, line 25)
+	_mtx_lock_flags (&q->p)(file:cache.c, line 14)
+q->p: locked => error
+	test ()(file:cache.c, line 26)
+	_mtx_lock_flags (&q->p)(file:cache.c, line 14)
+======= Backtrace stop ========
+
+Unlock before Lock.
+======= Backtrace start =======
+q->p: init => error
+	test ()(file:cache.c, line 26)
+	_mtx_unlock_flags (&q->p)(file:cache.c, line 16)
+======= Backtrace stop ========
+
+Exit with lock hold.
+======= Backtrace start =======
+CACHE: init => locked
+	test ()(file:cache.c, line 27)
+Halt with state locked
+======= Backtrace stop ========
+
+Exit with lock hold.
+======= Backtrace start =======
+q->p: init => locked
+	test ()(file:cache.c, line 25)
+	_mtx_lock_flags (&q->p)(file:cache.c, line 14)
+CACHE: locked => locked
+	test ()(file:cache.c, line 27)
+Halt with state locked
+======= Backtrace stop ========
+
+Exit with lock hold.
+======= Backtrace start =======
+q->p: init => locked
+	test ()(file:cache.c, line 25)
+	_mtx_lock_flags (&q->p)(file:cache.c, line 14)
+q->p: locked => init
+	test ()(file:cache.c, line 26)
+	_mtx_unlock_flags (&q->p)(file:cache.c, line 16)
+CACHE: init => locked
+	test ()(file:cache.c, line 27)
+Halt with state locked
+======= Backtrace stop ========
+
+Exit with lock hold.
+======= Backtrace start =======
+q->p: init => locked
+	test ()(file:cache.c, line 26)
+	_mtx_lock_flags (&q->p)(file:cache.c, line 14)
+CACHE: locked => locked
+	test ()(file:cache.c, line 27)
+Halt with state locked
+======= Backtrace stop ========
+

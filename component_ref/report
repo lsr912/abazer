@@ -1,0 +1,9 @@
+Possible memory leak when halt
+======= Backtrace start =======
+q->j: init => unknown
+	test (&p)(file:component_ref_test.c, line 21)
+	q->j = malloc (4)(file:component_ref_test.c, line 13)
+Halt with state unknown
+	test (&p)(file:component_ref_test.c, line 22)
+======= Backtrace stop ========
+

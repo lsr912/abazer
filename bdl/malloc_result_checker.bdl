@@ -1,0 +1,11 @@
+sm malloc_result_checker{
+   option sensitive;
+   declare_sv {ptr} p;
+
+   p.init: { p = malloc() } => p.unchecked {}
+   p.unchecked: { p == NULL } => p.checked {}
+   p.unchecked: { p != NULL } => p.checked {}
+   p.checked: { p = malloc() } => p.unchecked {}
+   p.unchecked: { END } => p.unchecked { err("have not check the malloc result\n"); backtrace(); }
+   p.unchecked: { p = malloc() } => p.unchecked { err("have not check the malloc result\n"); backtrace(); }
+}

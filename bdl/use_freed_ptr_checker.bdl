@@ -1,0 +1,15 @@
+sm use_freed_ptr_checker{
+   option sensitive;
+   declare {any} a;
+   declare_sv {ptr} p;
+
+   p.freed: { p = malloc() } => p.unknown {}
+   p.unknown: { p == NULL } => p.freed {}
+   p.unknown: { p != NULL } => p.malloced {}
+   p.freed: { p = &a } => p.alias {}
+   p.unknown: { p = &a } => p.alias {}
+   p.malloced: { free(p) } => p.freed {}
+   p.unknown: { free(p) } => p.freed {}
+   p.freed: { *p } => p.freed { err("use freed pointer!\n"); backtrace(); }
+   p.unknown: { *p } => p.unknown { err("use unknown pointer!\n"); backtrace(); }
+}

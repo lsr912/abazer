@@ -1,0 +1,45 @@
+sm 
+malloc_free_checker
+{
+	option sensitive;
+	
+	declare_sv { ptr } p;
+	declare { any } size;
+
+	p.init: { p = malloc(size) }
+		=> p.unknown {}
+	p.init: { free(p) }
+		=> p.error { err("Free before malloc!\n"); backtrace();}
+	p.init: { *p }
+		=> p.error { err("Dereference an uninitialized pointer!\n"); backtrace();}
+
+	p.unknown: { p = malloc(size) }
+		=> p.error { err("Possible memory leak!\n"); backtrace(); }
+	p.unknown: { free(p) }
+		=> p.freed {}
+	p.unknown: { p == NULL }
+		=> p.empty {}
+	p.unknown: { p != NULL }
+		=> p.malloced {}
+	p.unknown: { *p }
+		=> p.error { err("Possibly dereference a NULL pointer\n"); backtrace(); }
+	p.unknown: { END }
+		=> p.error { err("Possible memory leak when halt\n"); backtrace(); }
+
+	p.malloced: { p = malloc(size) }
+		=> p.error { err("Memory leak\n"); backtrace(); }
+	p.malloced: { free(p) }
+		=> p.freed {}	
+	p.malloced: { END }
+		=> p.error { err("Memory leak when halt\n"); backtrace(); }
+
+	p.freed: { p = malloc(size) }
+		=> p.unknown {}
+	p.freed: { free(p) }
+		=> p.error { err("Double free\n"); backtrace(); } 
+
+	p.empty: { p = malloc(size) }
+		=> p.unknown {}
+	p.empty: { *p }
+		=> p.error { err("Dereference a NULL pointer!\n"); backtrace(); }
+}

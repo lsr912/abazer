@@ -1,0 +1,39 @@
+sm
+lock_checker
+{
+	option	sensitive;
+	declare_sv {any}	L;
+
+	L.init: { _mtx_lock_flags(&L) }
+		=> L.locked {}
+	L.init: { _mtx_trylock(&L) != 0 }
+		=> L.locked {}
+	L.init: { _mtx_unlock_flags(&L) }
+		=> L.error { err("Unlock before Lock.\n"); backtrace(); }
+	L.init: { _mtx_lock_spin_flags(&L) }
+		=> L.spinlocked {}
+	L.init: { _mtx_unlock_spin_flags(&L) }
+		=> L.error { err("Unlock spin before Lock.\n"); backtrace(); }
+	
+	L.locked: { _mtx_lock_flags(&L) }
+		=> L.error { err("Double lock.\n"); backtrace(); }	
+	L.locked: { _mtx_trylock(&L) }
+		=> L.error { err("Try Double lock.\n"); backtrace(); }
+	L.locked: { _mtx_unlock_flags(&L) }
+		=> L.init {}	
+	L.locked: { mtx_destroy(&L) }
+		=> L.init {}	
+	L.locked: { END }
+		=> L.error { err("Exit with lock hold.\n"); backtrace(); }
+
+	L.spinlocked: { _mtx_lock_spin_flags(&L) }
+		=> L.error { err("Double spin lock.\n"); backtrace(); }
+	L.spinlocked: { _mtx_trylock(&L) }
+		=> L.error { err("Try Double spin lock.\n"); backtrace(); }
+	L.spinlocked: { _mtx_unlock_spin_flags(&L) }
+		=> L.init {}
+	L.spinlocked: { mtx_destroy(&L) }
+		=> L.init {}	
+	L.spinlocked: { END }
+		=> L.error { err("Exit with spinlock hold.\n"); backtrace(); }
+}
